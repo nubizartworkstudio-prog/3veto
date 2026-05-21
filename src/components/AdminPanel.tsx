@@ -250,43 +250,32 @@ export default function AdminPanel({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 30 }}
               transition={{ duration: 0.3 }}
-              className="w-full max-w-4xl bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden"
+              className={`w-full ${!isUnlocked ? 'max-w-md' : 'max-w-4xl'} bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transition-all duration-300`}
               id="admin-module-container"
             >
-              {/* Header */}
-              <div className="p-5 border-b border-neutral-800 bg-neutral-900/60 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <span className="p-1 px-2 text-[8px] font-mono font-black bg-lime-400/10 text-lime-400 border border-lime-400/25 rounded uppercase">
-                    ROOT SHELL
-                  </span>
-                  <h3 className="text-lg font-display font-black text-white italic tracking-tight uppercase">
-                    Sistem Pengurusan Konsert (Admin)
-                  </h3>
-                </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
-                  id="btn-admin-close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Security Barrier: Password Input */}
               {!isUnlocked ? (
-                <div className="flex-grow p-4 sm:p-8 flex flex-col items-center justify-center max-w-md mx-auto text-center space-y-6">
-                  <div className="w-16 h-16 bg-lime-400/10 hover:bg-lime-400/20 border border-lime-400/20 rounded-2xl flex items-center justify-center">
-                    <Lock className="w-8 h-8 text-lime-400 animate-pulse" />
-                  </div>
+                <>
+                  <div className="relative p-8 flex flex-col items-center justify-center w-full mx-auto text-center space-y-6">
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="absolute top-4 right-4 p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                      id="btn-login-close"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
 
-                  <div className="space-y-2">
-                    <h4 className="text-white font-display font-black text-xl italic uppercase">Gated Administrator Portal</h4>
-                    <p className="text-xs text-neutral-400 leading-relaxed font-sans">
-                      Sila masukkan emel dan kata laluan Google untuk mendapatkan akses keselamatan Firebase Penuh. Pengesahan Google Popup juga disediakan di bawah.
-                    </p>
-                  </div>
+                    <div className="w-16 h-16 bg-lime-400/10 hover:bg-lime-400/20 border border-lime-400/20 rounded-2xl flex items-center justify-center mt-2">
+                      <Lock className="w-8 h-8 text-lime-400 animate-pulse" />
+                    </div>
 
-                  <form onSubmit={handleUnlock} className="w-full space-y-4">
+                    <div className="space-y-2">
+                      <h4 className="text-white font-display font-black text-xl italic uppercase">Admin Authentication</h4>
+                      <p className="text-[11px] text-neutral-400 leading-relaxed font-sans px-2">
+                        Sila masukkan emel dan kata laluan untuk pengesahan identiti sebelum mengakses Sistem Pengurusan Konsert.
+                      </p>
+                    </div>
+
+                    <form onSubmit={handleUnlock} className="w-full space-y-4">
                     <div className="relative">
                       <input
                         type="email"
@@ -329,13 +318,33 @@ export default function AdminPanel({
                       className="w-full py-3 bg-lime-400 hover:bg-lime-300 text-black font-display font-black text-xs tracking-widest uppercase rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       id="btn-admin-unlock-submit"
                     >
-                      {isLoading ? 'MENGESAHKAN...' : 'SAHKAN AKSES SECURE'}
+                      {isLoading ? 'MENGESAHKAN...' : 'LOG MASUK'}
                     </button>
                   </form>
-                </div>
+                  </div>
+                </>
               ) : (
                 /* Unlocked Admin Workspace Layout */
                 <>
+                  {/* Header */}
+                  <div className="p-5 border-b border-neutral-800 bg-neutral-900/60 flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="p-1 px-2 text-[8px] font-mono font-black bg-lime-400/10 text-lime-400 border border-lime-400/25 rounded uppercase">
+                        ROOT SHELL
+                      </span>
+                      <h3 className="text-lg font-display font-black text-white italic tracking-tight uppercase border-none m-0 p-0">
+                        Sistem Pengurusan Konsert (Admin)
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setIsOpen(false)}
+                      className="p-1.5 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
+                      id="btn-admin-close"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
                   {/* Google Status Header Info */}
                   <div className="px-6 md:px-8 py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs bg-neutral-950/60 border-b border-neutral-800">
                     <div className="flex items-center gap-2 py-1">
