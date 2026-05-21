@@ -1,0 +1,34 @@
+{
+  "entities": {
+    "AppSettings": {
+      "title": "AppSettings",
+      "description": "Global application setting document containing the hero photo, bands list, and ticket tier configuration.",
+      "type": "object",
+      "properties": {
+        "heroPhoto": {
+          "type": "string",
+          "description": "The URL of the hero image background"
+        },
+        "bands": {
+          "type": "array",
+          "description": "Dynamic array of band configurations"
+        },
+        "ticketTiers": {
+          "type": "array",
+          "description": "Dynamic array of ticket tier options"
+        }
+      },
+      "required": [
+        "heroPhoto",
+        "bands",
+        "ticketTiers"
+      ]
+    }
+  },
+  "firestore": {
+    "settings/config": {
+      "schema": "AppSettings",
+      "description": "The single config document storing overall console-managed variables."
+    }
+  }
+}

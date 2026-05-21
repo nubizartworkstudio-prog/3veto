@@ -3,6 +3,9 @@ import { Lock, Eye, EyeOff, Save, X, RefreshCw, Plus, Trash2, Image, FileText, U
 import { motion, AnimatePresence } from 'motion/react';
 import { Band, TicketTier } from '../types';
 import { BANDS, TICKET_TIERS } from '../data';
+import { auth, db, handleFirestoreError, OperationType } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
 
 interface AdminPanelProps {
   heroPhoto: string;
@@ -26,6 +29,7 @@ export default function AdminPanel({
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   // Administrative edits state
   const [tempHero, setTempHero] = useState(heroPhoto);
@@ -33,6 +37,14 @@ export default function AdminPanel({
   const [tempTicketTiers, setTempTicketTiers] = useState<TicketTier[]>([]);
   const [activeBandId, setActiveBandId] = useState<string>('search');
   const [newMemberName, setNewMemberName] = useState('');
+
+  // Subscribe to Firebase Auth
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return unsubscribe;
+  }, []);
 
   // Synchronize when panel opens or props change
   useEffect(() => {
@@ -42,6 +54,13 @@ export default function AdminPanel({
       setTempTicketTiers(JSON.parse(JSON.stringify(ticketTiers))); // Deep copy
     }
   }, [isOpen, heroPhoto, bands, ticketTiers]);
+
+  // If signed in as the matching admin, unlock the board instantly
+  useEffect(() => {
+    if (currentUser?.email === 'nubiz.artwork.studio@gmail.com') {
+      setIsUnlocked(true);
+    }
+  }, [currentUser]);
 
   // Handle password unlock
   const handleUnlock = (e: React.FormEvent) => {
@@ -64,7 +83,26 @@ export default function AdminPanel({
     }
   }, []);
 
-  const handleSave = () => {
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      console.error('Google Sign-In failed:', err);
+      alert('Pendaftaran Google gagal: ' + err.message);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (err: any) {
+      console.error('Google Sign-Out failed:', err);
+    }
+  };
+
+  const handleSave = async () => {
     // 1. Save Hero background
     setHeroPhoto(tempHero);
     localStorage.setItem('3veto_hero_photo', tempHero);
@@ -77,12 +115,31 @@ export default function AdminPanel({
     setTicketTiers(tempTicketTiers);
     localStorage.setItem('3veto_ticket_tiers', JSON.stringify(tempTicketTiers));
 
-    // Show visual feedback & close
-    alert('Konfigurasi berjaya dikemaskini sepenuhnya!');
+    // 4. Save to Firestore if Admin
+    if (currentUser?.email === 'nubiz.artwork.studio@gmail.com') {
+      const targetPath = 'settings/config';
+      try {
+        await setDoc(doc(db, 'settings', 'config'), {
+          heroPhoto: tempHero,
+          bands: tempBands,
+          ticketTiers: tempTicketTiers
+        });
+        alert('Konfigurasi berjaya dikemaskini sepenuhnya pada Awan Firestore & Tempatan! ☁️✅');
+      } catch (err) {
+        try {
+          handleFirestoreError(err, OperationType.WRITE, targetPath);
+        } catch (typedErr: any) {
+          alert('Gagal simpan ke Awan: ' + typedErr.message);
+        }
+      }
+    } else {
+      alert('Konfigurasi disimpan secara Tempatan sahaja. Sila log masuk dengan Google Admin untuk penyegerakan real-time Firestore ⚠️');
+    }
+
     setIsOpen(false);
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (window.confirm('Adakah anda pasti mahu set semula semua foto hero, butiran kumpulan, dan harga tiket ke tetapan asal kilang?')) {
       const defaultHero = "https://arleta.site/interactivelink/3025/3veto.jpeg";
       setTempHero(defaultHero);
@@ -97,7 +154,25 @@ export default function AdminPanel({
       setTicketTiers(TICKET_TIERS);
       localStorage.removeItem('3veto_ticket_tiers');
 
-      alert('Semua tetapan telah diset semula ke konfigurasi asal.');
+      if (currentUser?.email === 'nubiz.artwork.studio@gmail.com') {
+        const targetPath = 'settings/config';
+        try {
+          await setDoc(doc(db, 'settings', 'config'), {
+            heroPhoto: defaultHero,
+            bands: BANDS,
+            ticketTiers: TICKET_TIERS
+          });
+          alert('Semua tetapan telah diset semula ke konfigurasi asal pada Awan & Tempatan! ☁️🔄');
+        } catch (err) {
+          try {
+            handleFirestoreError(err, OperationType.WRITE, targetPath);
+          } catch (typedErr: any) {
+            alert('Gagal set semula di Awan: ' + typedErr.message);
+          }
+        }
+      } else {
+        alert('Semua tetapan telah diset semula ke konfigurasi asal secara Tempatan.');
+      }
     }
   };
 
@@ -234,10 +309,73 @@ export default function AdminPanel({
                       SAHKAN AKSES SECURE
                     </button>
                   </form>
+
+                  <div className="relative flex py-2 items-center w-full">
+                    <div className="flex-grow border-t border-neutral-800"></div>
+                    <span className="flex-shrink mx-4 text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Atau</span>
+                    <div className="flex-grow border-t border-neutral-800"></div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    className="w-full py-3.5 bg-neutral-950 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-white font-sans text-xs font-bold uppercase rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:scale-[1.01]"
+                    id="btn-admin-google-signin"
+                  >
+                    <svg className="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                      />
+                    </svg>
+                    Masuk Sebagai Admin Google
+                  </button>
                 </div>
               ) : (
                 /* Unlocked Admin Workspace Layout */
                 <>
+                  {/* Google Status Header Info */}
+                  <div className="px-6 md:px-8 py-2 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs bg-neutral-950/60 border-b border-neutral-800">
+                    <div className="flex items-center gap-2 py-1">
+                      <span className={`w-2 h-2 rounded-full ${currentUser?.email === 'nubiz.artwork.studio@gmail.com' ? 'bg-lime-400 animate-pulse' : 'bg-yellow-500 animate-pulse'}`} />
+                      <span className="text-neutral-400 font-mono text-[10px]">
+                        Penyegar Awan: {currentUser ? (
+                          <>Disambung sebagai <span className={currentUser.email === 'nubiz.artwork.studio@gmail.com' ? "text-lime-400 font-bold" : "text-yellow-500 font-bold"}>{currentUser.email}</span>{currentUser.email === 'nubiz.artwork.studio@gmail.com' ? ' (Admin)' : ' (Bukan Admin)'}</>
+                        ) : (
+                          <span className="text-yellow-500 font-bold">Mod Tempatan Sahaja (Log Masuk Diperlukan Untuk Segerak Firestore)</span>
+                        )}
+                      </span>
+                    </div>
+                    {currentUser ? (
+                      <button 
+                        onClick={handleSignOut}
+                        type="button"
+                        className="py-1 px-3 bg-neutral-900 hover:bg-neutral-850 text-neutral-400 text-[10px] font-mono font-bold uppercase rounded border border-neutral-800 hover:border-neutral-700 transition-colors cursor-pointer"
+                      >
+                        Keluar Akaun
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={handleGoogleSignIn}
+                        type="button"
+                        className="py-1 px-3 bg-lime-400 hover:bg-lime-300 text-black text-[10px] font-mono font-bold uppercase rounded transition-colors cursor-pointer font-black"
+                      >
+                        Log Masuk Google Admin 🔑
+                      </button>
+                    )}
+                  </div>
                   <div className="flex-grow overflow-y-auto p-6 md:p-8 space-y-8">
                     {/* General Settings Section (Hero Photo URL) */}
                     <div className="bg-neutral-950/50 p-5 rounded-2xl border border-neutral-850 space-y-4">

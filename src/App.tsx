@@ -21,6 +21,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { BANDS, TICKET_TIERS } from './data';
 import AdminPanel from './components/AdminPanel';
 import { Band, TicketTier } from './types';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType } from './firebase';
 
 export default function App() {
   const [heroPhoto, setHeroPhoto] = useState<string>(() => {
@@ -48,6 +50,26 @@ export default function App() {
     }
     return TICKET_TIERS;
   });
+
+  // Listen to Firestore real-time settings configuration
+  useEffect(() => {
+    const unsub = onSnapshot(
+      doc(db, 'settings', 'config'),
+      (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          if (data.heroPhoto) setHeroPhoto(data.heroPhoto);
+          if (data.bands) setBands(data.bands);
+          if (data.ticketTiers) setTicketTiers(data.ticketTiers);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, 'settings/config');
+      }
+    );
+    return unsub;
+  }, []);
+
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [showStickyBar, setShowStickyBar] = useState(false);
 
