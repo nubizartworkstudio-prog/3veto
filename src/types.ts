@@ -26,6 +26,7 @@ export interface TicketTier {
   color: string;
   status: 'Available' | 'Selling Fast' | 'Sold Out';
   seatsLeft?: number;
+  hideNormalPrice?: boolean;
 }
 
 export interface QuizQuestion {

@@ -362,7 +362,9 @@ export default function SeatingPlan({ ticketTiers }: SeatingPlanProps) {
               >
                 <div className="text-[9px] font-mono text-neutral-500 uppercase truncate font-bold">TIER</div>
                 <div className="text-xs font-bold font-sans truncate">{tier.name.split(' (')[0]}</div>
-                <div className="text-xs font-black mt-1 font-mono text-lime-400">EB: RM {Number(tier.price).toFixed(2)}</div>
+                <div className="text-xs font-black mt-1 font-mono text-lime-400">
+                  {tier.hideNormalPrice ? '' : 'EB: '}RM {Number(tier.earlyBirdPrice !== undefined ? tier.earlyBirdPrice : tier.price).toFixed(2)}
+                </div>
               </button>
             ))}
           </div>
@@ -394,12 +396,16 @@ export default function SeatingPlan({ ticketTiers }: SeatingPlanProps) {
                   
                   <div className="text-right">
                     <span className="text-[9px] uppercase font-mono tracking-widest text-neutral-500 font-bold block">HARGA TIKET:</span>
-                    <div className="text-lg font-mono font-black text-lime-400">EB: RM {Number(selectedTier.earlyBirdPrice !== undefined ? selectedTier.earlyBirdPrice : selectedTier.price).toFixed(2)}</div>
-                    <div className="text-[10px] font-mono text-neutral-500 font-bold mt-0.5">NP: RM {Number(selectedTier.normalPrice !== undefined ? selectedTier.normalPrice : selectedTier.price).toFixed(2)}</div>
+                    <div className="text-lg font-mono font-black text-lime-400">
+                      {selectedTier.hideNormalPrice ? '' : 'EB: '}RM {Number(selectedTier.earlyBirdPrice !== undefined ? selectedTier.earlyBirdPrice : selectedTier.price).toFixed(2)}
+                    </div>
+                    {!selectedTier.hideNormalPrice && (
+                      <div className="text-[10px] font-mono text-neutral-500 font-bold mt-0.5">
+                        NP: RM {Number(selectedTier.normalPrice !== undefined ? selectedTier.normalPrice : selectedTier.price).toFixed(2)}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-
 
                 {/* Perks Checklist */}
                 <h5 className="text-xs font-mono text-neutral-400 font-bold uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -428,7 +434,7 @@ export default function SeatingPlan({ ticketTiers }: SeatingPlanProps) {
                   <Ticket className="w-4.5 h-4.5" /> BELI {selectedTier.name.split(' (')[0]} SEKARANG 🎫
                 </a>
                 <span className="text-[9px] text-neutral-500 text-center block mt-2 font-mono">
-                  *Pautan rasmi UberTickets dengan Kod Akses Marrazi aktif. EB = Early Bird | NP = Normal Price.
+                  *Pautan rasmi UberTickets dengan Kod Akses Marrazi aktif.{!selectedTier.hideNormalPrice && ' EB = Early Bird | NP = Normal Price.'}
                 </span>
               </div>
             </motion.div>

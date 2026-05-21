@@ -720,9 +720,28 @@ export default function AdminPanel({
                               </div>
 
                               <div>
-                                <label className="text-[9px] font-mono text-neutral-500 font-bold uppercase tracking-wider block mb-1">
-                                  NORMAL (RM):
-                                </label>
+                                <div className="flex items-center justify-between mb-1">
+                                  <label className="text-[9px] font-mono text-neutral-500 font-bold uppercase tracking-wider block">
+                                    NORMAL (RM):
+                                  </label>
+                                  <div className="flex items-center gap-1.5">
+                                    <input 
+                                      type="checkbox" 
+                                      id={`hide-np-${idx}`}
+                                      checked={tier.hideNormalPrice || false}
+                                      onChange={(e) => {
+                                        setTempTicketTiers(prev => prev.map((t, tIdx) => {
+                                          if (tIdx === idx) {
+                                            return { ...t, hideNormalPrice: e.target.checked };
+                                          }
+                                          return t;
+                                        }));
+                                      }}
+                                      className="w-3 h-3 accent-lime-400 bg-neutral-900 border-neutral-700 rounded cursor-pointer"
+                                    />
+                                    <label htmlFor={`hide-np-${idx}`} className="text-[8px] font-mono text-neutral-400 uppercase cursor-pointer">Sembunyi</label>
+                                  </div>
+                                </div>
                                 <input
                                   type="number"
                                   value={tier.normalPrice !== undefined ? tier.normalPrice : tier.price}
@@ -736,7 +755,8 @@ export default function AdminPanel({
                                       return t;
                                     }));
                                   }}
-                                  className="w-full p-2.5 bg-neutral-950 border border-neutral-800 rounded-lg text-xs font-mono text-neutral-300 focus:outline-none focus:border-neutral-700"
+                                  disabled={tier.hideNormalPrice}
+                                  className={`w-full p-2.5 border rounded-lg text-xs font-mono focus:outline-none ${tier.hideNormalPrice ? 'bg-neutral-900 border-neutral-800 text-neutral-600 cursor-not-allowed' : 'bg-neutral-950 border-neutral-800 text-neutral-300 focus:border-neutral-700'}`}
                                   min="0"
                                   step="0.01"
                                 />
