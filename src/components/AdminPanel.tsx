@@ -569,11 +569,11 @@ export default function AdminPanel({
                               </div>
                             </div>
 
-                            {/* DEMO RIFF PILIHAN CUSTOMIZER */}
+                            {/* LAGU NOSTALGIA PILIHAN CUSTOMIZER */}
                             <div className="space-y-3 pt-4 border-t border-neutral-800/80">
                               <div className="flex items-center justify-between">
                                 <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider block font-bold">
-                                  DEMO RIFF PILIHAN ({activeBand.famousSongs?.length || 0}):
+                                  LAGU NOSTALGIA PILIHAN ({activeBand.famousSongs?.length || 0}):
                                 </span>
                                 <span className="text-[8px] font-mono text-neutral-500">
                                   Kemaskini Demo Lagu Kumpulan

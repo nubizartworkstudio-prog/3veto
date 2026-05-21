@@ -303,7 +303,7 @@ export default function BandSection({ bands = BANDS }: BandSectionProps) {
               {/* Interactive Songs Trigger Panel */}
               <div className="relative z-10 mt-6 pt-5 border-t border-neutral-800/80">
                 <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-widest block mb-2.5 flex items-center gap-1">
-                  <Music className="w-3 h-3 text-neutral-500" /> DEMO RIFF PILIHAN (KLIK):
+                  <Music className="w-3 h-3 text-neutral-500" /> LAGU NOSTALGIA PILIHAN:
                 </span>
                 
                 <div className="space-y-1.5">
