@@ -1,0 +1,6 @@
+{
+  "name": "Konsert 3 Veto Landing Page",
+  "description": "Sebuah landing page super interaktif untuk mempromosikan jualan tiket Konsert 3 Veto (Wings, XPDC, Search) di Megastar Arena, Kuala Lumpur.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
