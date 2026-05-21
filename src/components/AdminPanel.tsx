@@ -493,6 +493,34 @@ export default function AdminPanel({
                                 placeholder="Contoh: Sesi latihan studio penjelajahan legenda..."
                               />
                             </div>
+
+                            {/* Year / established */}
+                            <div className="space-y-1.5 pt-2">
+                              <label className="text-[10px] font-mono text-neutral-500 tracking-wider uppercase block">
+                                TAHUN DITUBUHKAN:
+                              </label>
+                              <input
+                                type="text"
+                                value={activeBand.established || ''}
+                                onChange={(e) => updateActiveBandField('established', e.target.value)}
+                                className="w-full p-2.5 bg-neutral-950 border border-neutral-805 text-xs font-sans text-neutral-300 rounded-lg focus:outline-none focus:border-neutral-700"
+                                placeholder="Contoh: 1981"
+                              />
+                            </div>
+
+                            {/* Vocal / vocalist */}
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-mono text-neutral-500 tracking-wider uppercase block">
+                                VOKALIS UTAMA:
+                              </label>
+                              <input
+                                type="text"
+                                value={activeBand.vocalist || ''}
+                                onChange={(e) => updateActiveBandField('vocalist', e.target.value)}
+                                className="w-full p-2.5 bg-neutral-950 border border-neutral-805 text-xs font-sans text-neutral-300 rounded-lg focus:outline-none focus:border-neutral-700"
+                                placeholder="Contoh: Amy Search"
+                              />
+                            </div>
                           </div>
 
                           {/* Member and total statistics customization */}
