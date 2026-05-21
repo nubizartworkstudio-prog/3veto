@@ -284,11 +284,8 @@ export default function BandSection({ bands = BANDS }: BandSectionProps) {
 
                 {/* Live Member specifications lists */}
                 <div className="space-y-1 bg-neutral-950/40 p-3 rounded-xl border border-neutral-800/50">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[9px] font-mono text-neutral-500 uppercase block mb-1">BARISAN PAHLAWAN KONSERT:</span>
-                    <span className="text-[8px] font-mono text-neutral-400 bg-neutral-800 px-1 rounded">
-                      {band.memberNames.length} nama
-                    </span>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-mono text-neutral-500 uppercase block">BARISAN PAHLAWAN KONSERT:</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {band.memberNames.map((mem, idx) => (
