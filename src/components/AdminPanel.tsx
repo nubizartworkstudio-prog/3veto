@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Band, TicketTier } from '../types';
 import { BANDS, TICKET_TIERS } from '../data';
 import { auth, db, handleFirestoreError, OperationType } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User, signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 
 interface AdminPanelProps {
@@ -25,11 +25,13 @@ export default function AdminPanel({
   setTicketTiers
 }: AdminPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Administrative edits state
   const [tempHero, setTempHero] = useState(heroPhoto);
@@ -62,17 +64,26 @@ export default function AdminPanel({
     }
   }, [currentUser]);
 
-  // Handle password unlock
-  const handleUnlock = (e: React.FormEvent) => {
+  // Handle email/password login
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === '8477') {
+    if (!email || !password) {
+      setPasswordError('Sila masukkan emel dan kata laluan.');
+      return;
+    }
+    
+    setIsLoading(true);
+    setPasswordError('');
+    
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       setIsUnlocked(true);
-      setPasswordError('');
-      // Save unlock status for session convenience
-      sessionStorage.setItem('3veto_admin_unlocked', 'true');
-    } else {
-      setPasswordError('Katalaluan tidak sah! Sila cuba lagi.');
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      setPasswordError('Log masuk gagal. Sila semak emel dan kata laluan anda.');
       setIsUnlocked(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -271,19 +282,30 @@ export default function AdminPanel({
                   <div className="space-y-2">
                     <h4 className="text-white font-display font-black text-xl italic uppercase">Gated Administrator Portal</h4>
                     <p className="text-xs text-neutral-400 leading-relaxed font-sans">
-                      Sila masukkan kod kelayakan keselamatan (Password: 8477) untuk mendapatkan akses penuh meminda gambar panggung, imej kumpulan rock, perincian nama & bilangan ahli.
+                      Sila masukkan emel dan kata laluan Google untuk mendapatkan akses keselamatan Firebase Penuh. Pengesahan Google Popup juga disediakan di bawah.
                     </p>
                   </div>
 
                   <form onSubmit={handleUnlock} className="w-full space-y-4">
                     <div className="relative">
                       <input
+                        type="email"
+                        placeholder="Emel Pentadbir (Admin)"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full py-3.5 pl-4 pr-12 bg-neutral-950 border border-neutral-800 rounded-xl text-sm font-mono text-center tracking-widest text-lime-400 focus:outline-none focus:border-lime-500 transition-colors placeholder:text-neutral-700 font-bold"
+                        autoFocus
+                        id="input-admin-email"
+                      />
+                    </div>
+                    
+                    <div className="relative">
+                      <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Masukkan Kata Laluan (8477)"
+                        placeholder="Kata Laluan"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full py-3.5 pl-4 pr-12 bg-neutral-950 border border-neutral-800 rounded-xl text-sm font-mono text-center tracking-widest text-lime-400 focus:outline-none focus:border-lime-500 transition-colors placeholder:text-neutral-700 font-bold"
-                        autoFocus
                         id="input-admin-password"
                       />
                       <button
@@ -303,10 +325,11 @@ export default function AdminPanel({
 
                     <button
                       type="submit"
-                      className="w-full py-3 bg-lime-400 hover:bg-lime-300 text-black font-display font-black text-xs tracking-widest uppercase rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer"
+                      disabled={isLoading}
+                      className="w-full py-3 bg-lime-400 hover:bg-lime-300 text-black font-display font-black text-xs tracking-widest uppercase rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                       id="btn-admin-unlock-submit"
                     >
-                      SAHKAN AKSES SECURE
+                      {isLoading ? 'MENGESAHKAN...' : 'SAHKAN AKSES SECURE'}
                     </button>
                   </form>
 
