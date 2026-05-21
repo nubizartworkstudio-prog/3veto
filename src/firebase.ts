@@ -1,11 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { getAnalytics } from 'firebase/analytics';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId); /* CRITICAL: The app will break without this line */
+const dbId = (firebaseConfig as any).firestoreDatabaseId;
+export const db = dbId ? getFirestore(app, dbId) : getFirestore(app); /* CRITICAL: Support dynamic Firestore instances or default instance */
 export const auth = getAuth();
+export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : undefined;
 
 // --- FIRESTORE SKILL MANDATORY IMPLEMENTATION ---
 export enum OperationType {
