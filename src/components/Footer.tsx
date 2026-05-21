@@ -38,7 +38,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative z-10 w-full bg-neutral-950 border-t border-neutral-850 pt-12 pb-36 sm:pb-28">
+    <footer className="relative w-full bg-neutral-950 border-t border-neutral-850 pt-12 pb-44 sm:pb-36">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Core Sections */}
@@ -122,7 +122,7 @@ export default function Footer() {
       {/* FULL POLICY DIALOG MODAL */}
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-55 flex items-center justify-center p-4 sm:p-6" id="policy-modal-container">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" id="policy-modal-container">
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
