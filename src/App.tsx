@@ -340,7 +340,7 @@ export default function App() {
 
             <div className="flex flex-col items-stretch sm:items-end gap-2 w-full sm:w-auto">
               <div className="flex justify-between sm:justify-end items-center gap-3">
-                <span className="text-[10px] font-mono text-neutral-500 uppercase font-bold">HARGA TIKET:</span>
+                <span className="text-[10px] font-mono text-neutral-500 uppercase font-bold">HARGA TIKET (TERMASUK CUKAI):</span>
                 <span className="text-sm font-bold font-mono text-lime-400 sm:text-base whitespace-nowrap">RM {minPrice.toFixed(2)} - RM {maxPrice.toFixed(2)}</span>
               </div>
               

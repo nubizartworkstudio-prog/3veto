@@ -395,7 +395,7 @@ export default function SeatingPlan({ ticketTiers }: SeatingPlanProps) {
                   </div>
                   
                   <div className="text-right">
-                    <span className="text-[9px] uppercase font-mono tracking-widest text-neutral-500 font-bold block">HARGA TIKET:</span>
+                    <span className="text-[9px] uppercase font-mono tracking-widest text-neutral-500 font-bold block">HARGA TIKET (TERMASUK CUKAI):</span>
                     <div className="text-lg font-mono font-black text-lime-400">
                       {selectedTier.hideNormalPrice ? '' : 'EB: '}RM {Number(selectedTier.earlyBirdPrice !== undefined ? selectedTier.earlyBirdPrice : selectedTier.price).toFixed(2)}
                     </div>
@@ -434,7 +434,7 @@ export default function SeatingPlan({ ticketTiers }: SeatingPlanProps) {
                   <Ticket className="w-4.5 h-4.5" /> BELI {selectedTier.name.split(' (')[0]} SEKARANG 🎫
                 </a>
                 <span className="text-[9px] text-neutral-500 text-center block mt-2 font-mono">
-                  *Pautan rasmi UberTickets dengan Kod Akses Marrazi aktif.{!selectedTier.hideNormalPrice && ' EB = Early Bird | NP = Normal Price.'}
+                  *Pautan rasmi UberTickets dengan Kod Akses Marrazi aktif.{!selectedTier.hideNormalPrice && ' EB = Early Bird | NP = Normal Price.'} Harga tiket sudah termasuk cukai.
                 </span>
               </div>
             </motion.div>
